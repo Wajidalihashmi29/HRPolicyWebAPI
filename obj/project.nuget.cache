@@ -1,11 +1,27 @@
 {
   "version": 2,
-  "dgSpecHash": "uFYgApRFQ38=",
+  "dgSpecHash": "nh3bt3g/xqs=",
   "success": true,
   "projectFilePath": "C:\\AzureFoundry\\HRPolicyWebAPI\\HRPolicyWebAPI.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\AzureAdmin\\.nuget\\packages\\azure.ai.extensions.openai\\2.0.0\\azure.ai.extensions.openai.2.0.0.nupkg.sha512",
+    "C:\\Users\\AzureAdmin\\.nuget\\packages\\azure.ai.projects\\2.0.1\\azure.ai.projects.2.0.1.nupkg.sha512",
+    "C:\\Users\\AzureAdmin\\.nuget\\packages\\azure.ai.projects.agents\\2.0.0\\azure.ai.projects.agents.2.0.0.nupkg.sha512",
+    "C:\\Users\\AzureAdmin\\.nuget\\packages\\azure.core\\1.53.0\\azure.core.1.53.0.nupkg.sha512",
+    "C:\\Users\\AzureAdmin\\.nuget\\packages\\azure.identity\\1.21.0\\azure.identity.1.21.0.nupkg.sha512",
+    "C:\\Users\\AzureAdmin\\.nuget\\packages\\azure.storage.blobs\\12.26.0\\azure.storage.blobs.12.26.0.nupkg.sha512",
+    "C:\\Users\\AzureAdmin\\.nuget\\packages\\azure.storage.common\\12.25.0\\azure.storage.common.12.25.0.nupkg.sha512",
     "C:\\Users\\AzureAdmin\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.5\\microsoft.aspnetcore.openapi.10.0.5.nupkg.sha512",
-    "C:\\Users\\AzureAdmin\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
+    "C:\\Users\\AzureAdmin\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\10.0.3\\microsoft.bcl.asyncinterfaces.10.0.3.nupkg.sha512",
+    "C:\\Users\\AzureAdmin\\.nuget\\packages\\microsoft.identity.client\\4.83.1\\microsoft.identity.client.4.83.1.nupkg.sha512",
+    "C:\\Users\\AzureAdmin\\.nuget\\packages\\microsoft.identity.client.extensions.msal\\4.83.1\\microsoft.identity.client.extensions.msal.4.83.1.nupkg.sha512",
+    "C:\\Users\\AzureAdmin\\.nuget\\packages\\microsoft.identitymodel.abstractions\\8.14.0\\microsoft.identitymodel.abstractions.8.14.0.nupkg.sha512",
+    "C:\\Users\\AzureAdmin\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512",
+    "C:\\Users\\AzureAdmin\\.nuget\\packages\\openai\\2.10.0\\openai.2.10.0.nupkg.sha512",
+    "C:\\Users\\AzureAdmin\\.nuget\\packages\\system.clientmodel\\1.10.0\\system.clientmodel.1.10.0.nupkg.sha512",
+    "C:\\Users\\AzureAdmin\\.nuget\\packages\\system.io.hashing\\8.0.0\\system.io.hashing.8.0.0.nupkg.sha512",
+    "C:\\Users\\AzureAdmin\\.nuget\\packages\\system.memory.data\\10.0.3\\system.memory.data.10.0.3.nupkg.sha512",
+    "C:\\Users\\AzureAdmin\\.nuget\\packages\\system.security.cryptography.protecteddata\\4.5.0\\system.security.cryptography.protecteddata.4.5.0.nupkg.sha512"
   ],
   "logs": []
 }
