@@ -1,0 +1,6 @@
+@HRPolicyWebAPI_HostAddress = http://localhost:5157
+
+GET {{HRPolicyWebAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
