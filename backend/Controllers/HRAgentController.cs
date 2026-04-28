@@ -96,7 +96,7 @@ Give accurate citation verbatim as written in the policy documents.
     public async IAsyncEnumerable<string> SetupKnowledgeBase()
     {
         var client = CreateClient();
-        string pdfFolder = "C:\\AzureFoundry\\HRPolicyWebAPI\\Policy Documents";
+        string pdfFolder = "<Your local path to PDF folder>";// change this to your path to the policy doc folder
 
         if (!Directory.Exists(pdfFolder))
         {
@@ -151,7 +151,7 @@ Give accurate citation verbatim as written in the policy documents.
 
     // ── Chat (streaming SSE) ─────────────────────────────────────────────────
     [HttpPost("chat")]
-    public async IAsyncEnumerable<string> Chat([FromBody] ChatRequest req)
+    public async Task Chat([FromBody] ChatRequest req)
     {
         var agentVersion = _config["AzureOpenAI:AgentVersion"] ?? "1";
         var client = CreateClient();
@@ -193,17 +193,22 @@ Give accurate citation verbatim as written in the policy documents.
                         {
                             inputItems.Add(functionOutputItem);
                             functionCalled = true;
-                            yield return $"data: {JsonSerializer.Serialize(new { type = "citation", text = functionOutputItem.FunctionOutput })}\n\n";
+                            await Response.WriteAsync($"data: {JsonSerializer.Serialize(new { type = "citation", text = functionOutputItem.FunctionOutput })}\n\n");
+                            await Response.Body.FlushAsync();
                         }
                     }
                 }
 
                 if (streamResponse is StreamingResponseOutputTextDeltaUpdate textDelta)
-                    yield return $"data: {JsonSerializer.Serialize(new { type = "text", text = textDelta.Delta })}\n\n";
+                {
+                    await Response.WriteAsync($"data: {JsonSerializer.Serialize(new { type = "text", text = textDelta.Delta })}\n\n");
+                    await Response.Body.FlushAsync();
+                }
                 else if (streamResponse is StreamingResponseErrorUpdate errorUpdate)
                 {
-                    yield return $"data: {JsonSerializer.Serialize(new { type = "error", text = errorUpdate.Message })}\n\n";
-                    yield break;
+                    await Response.WriteAsync($"data: {JsonSerializer.Serialize(new { type = "error", text = errorUpdate.Message })}\n\n");
+                    await Response.Body.FlushAsync();
+                    return;
                 }
             }
 
@@ -216,7 +221,8 @@ Give accurate citation verbatim as written in the policy documents.
             else break;
         }
 
-        yield return $"data: {JsonSerializer.Serialize(new { type = "done" })}\n\n";
+        await Response.WriteAsync($"data: {JsonSerializer.Serialize(new { type = "done" })}\n\n");
+        await Response.Body.FlushAsync();
     }
 
     // ── Helper ───────────────────────────────────────────────────────────────
