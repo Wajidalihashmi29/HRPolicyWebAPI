@@ -12,8 +12,6 @@ export const chatService = {
       body: JSON.stringify({ message }),
     });
 
-    console.log('chatService: got response', response.status, response.statusText, response.headers.get('content-type'));
-
     if (!response.ok) {
       throw new Error(`API error: ${response.status} ${response.statusText}`);
     }

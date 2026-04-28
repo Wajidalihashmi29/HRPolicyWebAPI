@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HRPolicyWebAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7e87a8b109e9a1216969d576d0ec8f7e046b240b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+94078193ad3182ae7bf5d4b7a9f48ecfecac6423")]
 [assembly: System.Reflection.AssemblyProductAttribute("HRPolicyWebAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HRPolicyWebAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
