@@ -141,6 +141,81 @@
   border: 1px solid rgba(99, 102, 241, 0.12);
 }
 
+.message-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.citations {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.citations-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #1e293b;
+  background: #f8fafc;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+.citations-list {
+  margin-top: 12px;
+  display: grid;
+  gap: 12px;
+}
+
+.citation-item {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.citation-num {
+  font-weight: 700;
+  color: #4338ca;
+}
+
+.citation-doc,
+.citation-text {
+  font-size: 0.9rem;
+  color: #334155;
+}
+
+.citation-doc {
+  font-weight: 600;
+}
+
+.citation-text {
+  color: #475569;
+}
+
+.chat-warning {
+  margin: 0 28px 22px;
+  padding: 10px 14px;
+  border-radius: 18px;
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.10);
+  color: #475569;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  backdrop-filter: none;
+}
+
 .typing-indicator {
   display: inline-flex;
   gap: 6px;

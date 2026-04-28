@@ -87,6 +87,8 @@ function App() {
     setIsLoading(true)
 
     try {
+      const pendingCitations = []
+
       for await (const rawEvent of chatService.streamChat(userInput)) {
         console.log('App: rawEvent received', rawEvent)
         const event =
@@ -119,21 +121,25 @@ function App() {
           })
           await new Promise(resolve => setTimeout(resolve, 0))
         } else if (event.type === 'citation') {
-          setMessages(prev => {
-            const updated = [...prev]
-            const targetIndex = assistantIndexRef.current ?? updated.length - 1
-            const target = updated[targetIndex] ?? updated[updated.length - 1]
-            if (!target) return updated
-
-            updated[targetIndex] = {
-              ...target,
-              citations: [...(target.citations ?? []), event.text],
-            }
-            return updated
-          })
-          await new Promise(resolve => setTimeout(resolve, 0))
+          pendingCitations.push(event.text)
         }
       }
+
+      if (pendingCitations.length > 0) {
+        setMessages(prev => {
+          const updated = [...prev]
+          const targetIndex = assistantIndexRef.current ?? updated.length - 1
+          const target = updated[targetIndex] ?? updated[updated.length - 1]
+          if (!target) return updated
+
+          updated[targetIndex] = {
+            ...target,
+            citations: [...(target.citations ?? []), ...pendingCitations],
+          }
+          return updated
+        })
+      }
+
       addToast('Response received successfully', 'success')
     } catch (err) {
       addToast(`Error: ${err.message}`, 'error')
@@ -147,15 +153,15 @@ function App() {
     <div className="chat-container">
       <div className="chat-box">
         <header className="chat-header">
-          <h1>HR Policy Agent</h1>
+          <h1>Global Edge Corporations - HR Help Desk</h1>
           <p>Get clear, compliant answers about HR policies in real time.</p>
         </header>
 
         <div className="messages-container">
           {messages.length === 0 && (
             <div className="empty-state">
-              <h2>Welcome to HR Policy Agent</h2>
-              <p>Ask me any questions about HR policies and guidelines.</p>
+              <h2>Welcome to HR Help Desk</h2>
+              <p>Ask any questions about HR policies and guidelines.</p>
             </div>
           )}
 
@@ -163,15 +169,15 @@ function App() {
             <div key={idx} className={`message ${msg.type}`}>
               <div className="message-content">
                 {msg.content}
+                {msg.type === 'assistant' && msg.citations.length > 0 && (
+                  <CitationBlock citations={msg.citations} />
+                )}
                 {msg.type === 'assistant' && isLoading && idx === messages.length - 1 && (
                   <span className="typing-indicator">
                     <span></span><span></span><span></span>
                   </span>
                 )}
               </div>
-              {msg.type === 'assistant' && (
-                <CitationBlock citations={msg.citations} />
-              )}
             </div>
           ))}
 
@@ -191,6 +197,9 @@ function App() {
             {isLoading ? 'Sending...' : 'Send'}
           </button>
         </form>
+        <div className="chat-warning">
+          AI generated content may be incorrect. Please verify before relying on it.
+        </div>
       </div>
     </div>
   )
