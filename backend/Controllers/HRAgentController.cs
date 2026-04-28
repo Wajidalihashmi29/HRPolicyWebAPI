@@ -21,8 +21,7 @@ public class HRAgentController : ControllerBase
 
     private AIProjectClient CreateClient()
     {
-        var endpoint = _config["AzureOpenAI:ProjectEndpoint"]
-            ?? "https://af-msaitraining-b1-g2.services.ai.azure.com/api/projects/hrpolicy";
+        var endpoint = _config["AzureOpenAI:ProjectEndpoint"] ?? "";
         return new AIProjectClient(new Uri(endpoint), new DefaultAzureCredential());
     }
 
