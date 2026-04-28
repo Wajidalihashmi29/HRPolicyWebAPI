@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "yrMsBez62t4=",
+  "dgSpecHash": "7PPdlf9NlL0=",
   "success": true,
-  "projectFilePath": "C:\\AzureFoundry\\HRPolicyWebAPI\\backend\\HRPolicyWebAPI.csproj",
+  "projectFilePath": "C:\\Users\\AzureAdmin\\Desktop\\demo\\Project\\HRPolicyWebAPI\\backend\\HRPolicyWebAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\AzureAdmin\\.nuget\\packages\\azure.ai.extensions.openai\\2.0.0\\azure.ai.extensions.openai.2.0.0.nupkg.sha512",
     "C:\\Users\\AzureAdmin\\.nuget\\packages\\azure.ai.projects\\2.0.1\\azure.ai.projects.2.0.1.nupkg.sha512",

@@ -66,6 +66,8 @@ function App() {
   const handleSendMessage = async (e) => {
     e.preventDefault()
 
+    console.log('App: handleSendMessage called', inputValue)
+
     if (!inputValue.trim()) {
       addToast('Please enter a message', 'warning')
       return
@@ -86,13 +88,23 @@ function App() {
 
     try {
       for await (const rawEvent of chatService.streamChat(userInput)) {
+        console.log('App: rawEvent received', rawEvent)
         const event =
           typeof rawEvent === 'string'
             ? { type: 'text', text: rawEvent }
             : rawEvent
 
+        console.log('chat stream event', event)
+
+        if (event.type === 'done') {
+          break
+        }
+
+        if (event.type === 'error') {
+          throw new Error(event.text ?? 'Unknown chat error')
+        }
+
         if (event.type === 'text') {
-          // Append streamed text to the assistant message
           setMessages(prev => {
             const updated = [...prev]
             const targetIndex = assistantIndexRef.current ?? updated.length - 1
@@ -105,6 +117,7 @@ function App() {
             }
             return updated
           })
+          await new Promise(resolve => setTimeout(resolve, 0))
         } else if (event.type === 'citation') {
           setMessages(prev => {
             const updated = [...prev]
@@ -118,6 +131,7 @@ function App() {
             }
             return updated
           })
+          await new Promise(resolve => setTimeout(resolve, 0))
         }
       }
       addToast('Response received successfully', 'success')
