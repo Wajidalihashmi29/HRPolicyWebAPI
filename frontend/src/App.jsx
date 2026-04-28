@@ -3,10 +3,55 @@ import { chatService } from './services/chatService'
 import { useToast } from './contexts/ToastContext'
 import './App.css'
 
+function CitationBlock({ citations }) {
+  const [open, setOpen] = useState(false)
+  if (!citations || citations.length === 0) return null
+
+  return (
+    <div className="citations">
+      <button className="citations-toggle" onClick={() => setOpen(!open)}>
+        {open ? '▾' : '▸'} {citations.length} source{citations.length > 1 ? 's' : ''}
+      </button>
+      {open && (
+        <div className="citations-list">
+          {citations.map((c, i) => {
+            // Parse structured citation format from CitationFormatter.cs
+            const lines = c.split('\n').map(l => l.trim()).filter(Boolean)
+            const get = (prefix) => {
+              const line = lines.find(l => l.startsWith(prefix))
+              return line ? line.slice(prefix.length).trim() : null
+            }
+            const doc = get('Document:')
+            const page = get('Page:')
+            const section = get('Section:')
+            const text = get('Text:')
+            return (
+              <div key={i} className="citation-item">
+                <span className="citation-num">{i + 1}</span>
+                <div className="citation-body">
+                  {doc && (
+                    <div className="citation-doc">
+                      📄 {doc}
+                      {page ? ` · p.${page}` : ''}
+                      {section ? ` · ${section}` : ''}
+                    </div>
+                  )}
+                  {text && <div className="citation-text">{text}</div>}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function App() {
   const [messages, setMessages] = useState([])
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const assistantIndexRef = useRef(null)
   const messagesEndRef = useRef(null)
   const { addToast } = useToast()
 
@@ -20,36 +65,65 @@ function App() {
 
   const handleSendMessage = async (e) => {
     e.preventDefault()
-    
+
     if (!inputValue.trim()) {
       addToast('Please enter a message', 'warning')
       return
     }
 
-    // Add user message
-    const userMessage = { type: 'user', content: inputValue }
     const userInput = inputValue
-    setMessages(prev => [...prev, userMessage])
+    setMessages(prev => {
+      const next = [
+        ...prev,
+        { type: 'user', content: userInput, citations: [] },
+        { type: 'assistant', content: '', citations: [] },
+      ]
+      assistantIndexRef.current = next.length - 1
+      return next
+    })
     setInputValue('')
     setIsLoading(true)
 
     try {
-      // Create a placeholder for assistant message
-      const assistantMessage = { type: 'assistant', content: '' }
-      setMessages(prev => [...prev, assistantMessage])
+      for await (const rawEvent of chatService.streamChat(userInput)) {
+        const event =
+          typeof rawEvent === 'string'
+            ? { type: 'text', text: rawEvent }
+            : rawEvent
 
-      // Stream the response
-      for await (const chunk of chatService.streamChat(userInput)) {
-        setMessages(prev => {
-          const newMessages = [...prev]
-          newMessages[newMessages.length - 1].content += chunk
-          return newMessages
-        })
+        if (event.type === 'text') {
+          // Append streamed text to the assistant message
+          setMessages(prev => {
+            const updated = [...prev]
+            const targetIndex = assistantIndexRef.current ?? updated.length - 1
+            const target = updated[targetIndex] ?? updated[updated.length - 1]
+            if (!target) return updated
+
+            updated[targetIndex] = {
+              ...target,
+              content: (target.content ?? '') + event.text,
+            }
+            return updated
+          })
+        } else if (event.type === 'citation') {
+          setMessages(prev => {
+            const updated = [...prev]
+            const targetIndex = assistantIndexRef.current ?? updated.length - 1
+            const target = updated[targetIndex] ?? updated[updated.length - 1]
+            if (!target) return updated
+
+            updated[targetIndex] = {
+              ...target,
+              citations: [...(target.citations ?? []), event.text],
+            }
+            return updated
+          })
+        }
       }
       addToast('Response received successfully', 'success')
     } catch (err) {
       addToast(`Error: ${err.message}`, 'error')
-      setMessages(prev => prev.slice(0, -1)) // Remove the assistant message on error
+      setMessages(prev => prev.slice(0, -1))
     } finally {
       setIsLoading(false)
     }
@@ -64,28 +138,31 @@ function App() {
         </header>
 
         <div className="messages-container">
-        {messages.length === 0 && (
-          <div className="empty-state">
-            <h2>Welcome to HR Policy Agent</h2>
-            <p>Ask me any questions about HR policies and guidelines.</p>
-          </div>
-        )}
+          {messages.length === 0 && (
+            <div className="empty-state">
+              <h2>Welcome to HR Policy Agent</h2>
+              <p>Ask me any questions about HR policies and guidelines.</p>
+            </div>
+          )}
 
-        {messages.map((msg, idx) => (
-          <div key={idx} className={`message ${msg.type}`}>
-            <div className="message-content">
-              {msg.content}
-              {msg.type === 'assistant' && isLoading && idx === messages.length - 1 && (
-                <span className="typing-indicator">
-                  <span></span><span></span><span></span>
-                </span>
+          {messages.map((msg, idx) => (
+            <div key={idx} className={`message ${msg.type}`}>
+              <div className="message-content">
+                {msg.content}
+                {msg.type === 'assistant' && isLoading && idx === messages.length - 1 && (
+                  <span className="typing-indicator">
+                    <span></span><span></span><span></span>
+                  </span>
+                )}
+              </div>
+              {msg.type === 'assistant' && (
+                <CitationBlock citations={msg.citations} />
               )}
             </div>
-          </div>
-        ))}
-        
-        <div ref={messagesEndRef} />
-      </div>
+          ))}
+
+          <div ref={messagesEndRef} />
+        </div>
 
         <form className="input-form" onSubmit={handleSendMessage}>
           <input

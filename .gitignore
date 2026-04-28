@@ -1,0 +1,3 @@
+# Ignore local appsettings files
+appsettings*.json
+backend/appsettings.json

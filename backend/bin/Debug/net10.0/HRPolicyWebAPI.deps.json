@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v10.0": {
       "HRPolicyWebAPI/1.0.0": {
         "dependencies": {
+          "Azure.AI.Extensions.OpenAI": "2.0.0",
           "Azure.AI.Projects": "2.0.1",
           "Azure.Identity": "1.21.0",
           "Microsoft.AspNetCore.OpenApi": "10.0.5",

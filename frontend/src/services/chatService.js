@@ -18,28 +18,60 @@ export const chatService = {
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
+      let eventData = '';
+
+      const flushEvent = () => {
+        if (!eventData) return null;
+        try {
+          const event = JSON.parse(eventData);
+          eventData = '';
+          if (event.type === 'text' && event.text) return { type: 'text', text: event.text };
+          if (event.type === 'citation' && event.text) return { type: 'citation', text: event.text };
+          if (event.type === 'error') throw new Error(event.text);
+          if (event.type === 'done') return { type: 'done' };
+        } catch (parseError) {
+          console.error('Failed to parse SSE event:', eventData, parseError);
+        }
+        return null;
+      };
 
       while (true) {
         const { done, value } = await reader.read();
-
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
+        let lineEndIndex;
 
-        // Keep the last incomplete line in the buffer
-        buffer = lines.pop() || '';
+        while ((lineEndIndex = buffer.indexOf('\n')) !== -1) {
+          const line = buffer.slice(0, lineEndIndex).trim();
+          buffer = buffer.slice(lineEndIndex + 1);
 
-        for (const line of lines) {
-          if (line.trim()) {
-            yield line;
+          if (!line) {
+            const event = flushEvent();
+            if (event) {
+              if (event.type === 'done') return;
+              yield event;
+            }
+            continue;
+          }
+
+          if (line.startsWith('data:')) {
+            eventData += line.slice(5).trim();
           }
         }
       }
 
-      // Process any remaining data
       if (buffer.trim()) {
-        yield buffer;
+        const line = buffer.trim();
+        if (line.startsWith('data:')) {
+          eventData += line.slice(5).trim();
+        }
+      }
+
+      const finalEvent = flushEvent();
+      if (finalEvent) {
+        if (finalEvent.type === 'done') return;
+        yield finalEvent;
       }
     } catch (error) {
       console.error('Chat error:', error);
