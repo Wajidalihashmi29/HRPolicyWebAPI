@@ -96,7 +96,7 @@ Give accurate citation verbatim as written in the policy documents.
     public async IAsyncEnumerable<string> SetupKnowledgeBase()
     {
         var client = CreateClient();
-        string pdfFolder = "<Your local path to PDF folder>";// change this to your path to the policy doc folder
+        string pdfFolder = "C:\\Users\\AzureAdmin\\Desktop\\demo\\Project\\HRPolicyWebAPI\\Policy Documents";// change this to your path to the policy doc folder
 
         if (!Directory.Exists(pdfFolder))
         {
