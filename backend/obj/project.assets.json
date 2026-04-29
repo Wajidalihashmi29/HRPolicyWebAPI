@@ -764,11 +764,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\AzureFoundry\\HRPolicyWebAPI\\backend\\HRPolicyWebAPI.csproj",
+      "projectUniqueName": "C:\\Users\\AzureAdmin\\Desktop\\demo\\Project\\HRPolicyWebAPI\\backend\\HRPolicyWebAPI.csproj",
       "projectName": "HRPolicyWebAPI",
-      "projectPath": "C:\\AzureFoundry\\HRPolicyWebAPI\\backend\\HRPolicyWebAPI.csproj",
+      "projectPath": "C:\\Users\\AzureAdmin\\Desktop\\demo\\Project\\HRPolicyWebAPI\\backend\\HRPolicyWebAPI.csproj",
       "packagesPath": "C:\\Users\\AzureAdmin\\.nuget\\packages\\",
-      "outputPath": "C:\\AzureFoundry\\HRPolicyWebAPI\\backend\\obj\\",
+      "outputPath": "C:\\Users\\AzureAdmin\\Desktop\\demo\\Project\\HRPolicyWebAPI\\backend\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\AzureAdmin\\AppData\\Roaming\\NuGet\\NuGet.Config"
