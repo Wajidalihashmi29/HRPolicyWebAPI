@@ -2,11 +2,11 @@ import { useState, useRef, useEffect } from 'react'
 import { chatService } from './services/chatService'
 import { useToast } from './contexts/ToastContext'
 import './App.css'
-
+ 
 function CitationBlock({ citations }) {
   const [open, setOpen] = useState(false)
   if (!citations || citations.length === 0) return null
-
+ 
   return (
     <div className="citations">
       <button className="citations-toggle" onClick={() => setOpen(!open)}>
@@ -57,7 +57,7 @@ function CitationBlock({ citations }) {
     </div>
   )
 }
-
+ 
 function App() {
   const [messages, setMessages] = useState([])
   const [inputValue, setInputValue] = useState('')
@@ -65,25 +65,25 @@ function App() {
   const assistantIndexRef = useRef(null)
   const messagesEndRef = useRef(null)
   const { addToast } = useToast()
-
+ 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
-
+ 
   useEffect(() => {
     scrollToBottom()
   }, [messages])
-
+ 
   const handleSendMessage = async (e) => {
     e.preventDefault()
-
+ 
     console.log('App: handleSendMessage called', inputValue)
-
+ 
     if (!inputValue.trim()) {
       addToast('Please enter a message', 'warning')
       return
     }
-
+ 
     const userInput = inputValue
     setMessages(prev => {
       const next = [
@@ -96,34 +96,34 @@ function App() {
     })
     setInputValue('')
     setIsLoading(true)
-
+ 
     try {
       const pendingCitations = []
-
+ 
       for await (const rawEvent of chatService.streamChat(userInput)) {
         console.log('App: rawEvent received', rawEvent)
         const event =
           typeof rawEvent === 'string'
             ? { type: 'text', text: rawEvent }
             : rawEvent
-
+ 
         console.log('chat stream event', event)
-
+ 
         if (event.type === 'done') {
           break
         }
-
+ 
         if (event.type === 'error') {
           throw new Error(event.text ?? 'Unknown chat error')
         }
-
+ 
         if (event.type === 'text') {
           setMessages(prev => {
             const updated = [...prev]
             const targetIndex = assistantIndexRef.current ?? updated.length - 1
             const target = updated[targetIndex] ?? updated[updated.length - 1]
             if (!target) return updated
-
+ 
             updated[targetIndex] = {
               ...target,
               content: (target.content ?? '') + event.text,
@@ -132,12 +132,18 @@ function App() {
           })
           await new Promise(resolve => setTimeout(resolve, 0))
         } else if (event.type === 'citation') {
-          setMessages(prev => {
-            const updated = [...prev]
-            const targetIndex = assistantIndexRef.current ?? updated.length - 1
-            const target = updated[targetIndex] ?? updated[updated.length - 1]
-            if (!target) return updated
-
+          console.log('citation full text', event.text)
+          pendingCitations.push(event.text)
+        }
+      }
+ 
+      if (pendingCitations.length > 0) {
+        setMessages(prev => {
+          const updated = [...prev]
+          const targetIndex = assistantIndexRef.current ?? updated.length - 1
+          const target = updated[targetIndex] ?? updated[updated.length - 1]
+          if (!target) return updated
+ 
           updated[targetIndex] = {
             ...target,
             citations: [...(target.citations ?? []), ...pendingCitations],
@@ -145,7 +151,7 @@ function App() {
           return updated
         })
       }
-
+ 
       addToast('Response received successfully', 'success')
     } catch (err) {
       addToast(`Error: ${err.message}`, 'error')
@@ -154,7 +160,7 @@ function App() {
       setIsLoading(false)
     }
   }
-
+ 
   return (
     <div className="chat-container">
       <div className="chat-box">
@@ -162,7 +168,7 @@ function App() {
           <h1>Global Edge Corporations - HR Help Desk</h1>
           <p>Get clear, compliant answers about HR policies in real time.</p>
         </header>
-
+ 
         <div className="messages-container">
           {messages.length === 0 && (
             <div className="empty-state">
@@ -170,7 +176,7 @@ function App() {
               <p>Ask any questions about HR policies and guidelines.</p>
             </div>
           )}
-
+ 
           {messages.map((msg, idx) => (
             <div key={idx} className={`message ${msg.type}`}>
               <div className="message-content">
@@ -186,10 +192,10 @@ function App() {
               </div>
             </div>
           ))}
-
+ 
           <div ref={messagesEndRef} />
         </div>
-
+ 
         <form className="input-form" onSubmit={handleSendMessage}>
           <input
             type="text"
@@ -210,5 +216,5 @@ function App() {
     </div>
   )
 }
-
+ 
 export default App

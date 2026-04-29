@@ -27,3 +27,4 @@ frontend/dist-ssr
 *.njsproj
 *.sln
 *.sw?
+backend/bin
