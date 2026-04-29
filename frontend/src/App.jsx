@@ -25,6 +25,7 @@ function CitationBlock({ citations }) {
             const page = get('Page:')
             const section = get('Section:')
             const text = get('Text:')
+            const metaParts = [section && `Section: ${section}`, page && `Page: ${page}`].filter(Boolean)
             return (
               <div key={i} className="citation-item">
                 <span className="citation-num">{i + 1}</span>
@@ -32,11 +33,21 @@ function CitationBlock({ citations }) {
                   {doc && (
                     <div className="citation-doc">
                       📄 {doc}
-                      {page ? ` · p.${page}` : ''}
-                      {section ? ` · ${section}` : ''}
                     </div>
                   )}
-                  {text && <div className="citation-text">{text}</div>}
+                  {metaParts.length > 0 && (
+                    <div className="citation-meta">
+                      {metaParts.join(' • ')}
+                    </div>
+                  )}
+                  {text && (
+                    <div className="citation-text">
+                      {text}
+                    </div>
+                  )}
+                  {!page && !section && (
+                    <div className="citation-meta citation-missing">No page/section metadata available</div>
+                  )}
                 </div>
               </div>
             )
@@ -121,16 +132,11 @@ function App() {
           })
           await new Promise(resolve => setTimeout(resolve, 0))
         } else if (event.type === 'citation') {
-          pendingCitations.push(event.text)
-        }
-      }
-
-      if (pendingCitations.length > 0) {
-        setMessages(prev => {
-          const updated = [...prev]
-          const targetIndex = assistantIndexRef.current ?? updated.length - 1
-          const target = updated[targetIndex] ?? updated[updated.length - 1]
-          if (!target) return updated
+          setMessages(prev => {
+            const updated = [...prev]
+            const targetIndex = assistantIndexRef.current ?? updated.length - 1
+            const target = updated[targetIndex] ?? updated[updated.length - 1]
+            if (!target) return updated
 
           updated[targetIndex] = {
             ...target,

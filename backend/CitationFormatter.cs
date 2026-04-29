@@ -55,7 +55,7 @@ namespace VirtualHRFoundryAgent
                 },
                 new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
             ),
-            strictModeEnabled: false
+            strictModeEnabled: true
         );
 
         /// <summary>
@@ -126,13 +126,23 @@ namespace VirtualHRFoundryAgent
             int? pageNumber = null;
             if (root.TryGetProperty("pageNumber", out JsonElement pageElement))
             {
-                pageNumber = pageElement.GetInt32();
+                if (pageElement.ValueKind == JsonValueKind.Number && pageElement.TryGetInt32(out var pageValue))
+                {
+                    pageNumber = pageValue;
+                }
+                else if (pageElement.ValueKind == JsonValueKind.String &&
+                         int.TryParse(pageElement.GetString(), out var pageValueFromString))
+                {
+                    pageNumber = pageValueFromString;
+                }
             }
 
             string section = null;
             if (root.TryGetProperty("section", out JsonElement sectionElement))
             {
-                section = sectionElement.GetString();
+                section = sectionElement.ValueKind == JsonValueKind.String
+                    ? sectionElement.GetString()
+                    : sectionElement.ToString();
             }
 
             // Format and return the citation
