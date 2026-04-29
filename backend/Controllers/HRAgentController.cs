@@ -17,7 +17,13 @@ using VirtualHRFoundryAgent;
 public class HRAgentController : ControllerBase
 {
     private readonly IConfiguration _config;
-    public HRAgentController(IConfiguration config) => _config = config;
+    private readonly IWebHostEnvironment _environment;
+    private static string? _latestAgentVersion;
+    public HRAgentController(IConfiguration config, IWebHostEnvironment environment)
+    {
+        _config = config;
+        _environment = environment;
+    }
 
     private AIProjectClient CreateClient()
     {
@@ -51,20 +57,11 @@ public class HRAgentController : ControllerBase
                             "Please upload policy documents first via /api/hragent/setup/knowledge-base."
                 });
             }
-
+            var instructions = await GetAgentInstructionsAsync();
             var agentDefinition = new DeclarativeAgentDefinition(model: deployment)
             {
                 Temperature = 0.2f,
-                Instructions = @"You are a helpful Human Resources agent that can help employees understand our policies. 
-Your job is to explain the policies in a way that's comprehensive yet easy to understand and helpful for the user.
-Give accurate citation verbatim as written in the policy documents.
--[Important] Avoid very short responses. Use the retrieved policy information to provide comprehensive responses.
--[Critical] You must include citations for all information sourced from the uploaded files. Never give a response that is not explicitly grounded up by document citation.
--[Critical] If information found in the knowledge source is insufficient, say 'Sorry, I lack the information to assist you with this query.'
--[Critical] Do not entertain any request unrelated to HR policies. Politely tell the user you are unable to help with such requests.
--[Critical] You must pass the output of the FileSearch tool directly to the 'formatCitation' tool to prepare citations.
--[Critical] You are strictly forbidden from rephrasing or modifying content from the FileSearch tool while calling 'formatCitation'.
-- You must call formatCitation for every citation you include.",
+                Instructions = instructions,
                 Tools =
                 {
                     ResponseTool.CreateFileSearchTool(new List<string> { store.Id }, 12),
@@ -76,6 +73,8 @@ Give accurate citation verbatim as written in the policy documents.
                 agentName: "HRPolicyAgent",
                 options: new ProjectsAgentVersionCreationOptions(agentDefinition)
             );
+
+            _latestAgentVersion = agentVersion.Value.Version;
 
             return Ok(new
             {
@@ -153,7 +152,8 @@ Give accurate citation verbatim as written in the policy documents.
     [HttpPost("chat")]
     public async Task Chat([FromBody] ChatRequest req)
     {
-        var agentVersion = _config["AzureOpenAI:AgentVersion"] ?? "1";
+        var agentVersion = _latestAgentVersion ?? _config["AzureOpenAI:AgentVersion"] ?? "1";
+        Console.WriteLine($"Using agent version: {agentVersion}");
         var client = CreateClient();
 
         Response.ContentType = "text/event-stream";
@@ -228,6 +228,20 @@ Give accurate citation verbatim as written in the policy documents.
     // ── Helper ───────────────────────────────────────────────────────────────
     private static string Evt(string type, string text) =>
         $"data: {JsonSerializer.Serialize(new { type, text })}\n\n";
+
+    // used to set instructions in agent definition
+    private async Task<string> GetAgentInstructionsAsync()
+    {
+        var filePath = "C:\\AzureFoundry\\HRPolicyWebAPI\\backend\\HRAgentInstructions.txt";
+
+        if (!System.IO.File.Exists(filePath))
+        {
+            throw new FileNotFoundException($"Instructions file not found: {filePath}");
+        }
+
+        return await System.IO.File.ReadAllTextAsync(filePath);
+    }
+
 }
 
 public record ChatRequest(string Message);

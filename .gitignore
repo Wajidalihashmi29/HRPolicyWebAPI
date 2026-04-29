@@ -12,10 +12,15 @@ pnpm-debug.log*
 lerna-debug.log*
 
 frontend/node_modules
+obj
 backend/obj
+tempInspect/bin
+tempInspect/obj
 frontend/dist
 frontend/dist-ssr
+backend-build-temp/
 *.local
+
 
 # Editor directories and files
 .vscode/*

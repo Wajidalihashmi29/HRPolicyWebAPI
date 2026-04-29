@@ -19,42 +19,33 @@ namespace VirtualHRFoundryAgent
         public static readonly FunctionTool FormatCitationTool = ResponseTool.CreateFunctionTool(
             functionName: "formatCitation",
             functionDescription: "Formats a citation from file search results into a structured citation section with document link, text, page, section, and chunk properties.",
-            functionParameters: BinaryData.FromObjectAsJson(
-                new
-                {
-                    Type = "object",
-                    Properties = new
-                    {
-                        DocumentId = new
-                        {
-                            Type = "string",
-                            Description = "The unique identifier of the document (file ID from the file search results).",
-                        },
-                        DocumentName = new
-                        {
-                            Type = "string",
-                            Description = "The name of the document file.",
-                        },
-                        ChunkText = new
-                        {
-                            Type = "string",
-                            Description = "The text chunk or excerpt from the document that supports the response.",
-                        },
-                        PageNumber = new
-                        {
-                            Type = "integer",
-                            Description = "The page number where the citation text is found (if available).",
-                        },
-                        Section = new
-                        {
-                            Type = "string",
-                            Description = "The section or chapter name where the citation text is found (if available).",
-                        },
-                    },
-                    Required = new[] { "DocumentId", "DocumentName", "ChunkText", "PageNumber", "Section" },
-                },
-                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
-            ),
+            functionParameters: BinaryData.FromString("{\n" +
+                "  \"type\": \"object\",\n" +
+                "  \"properties\": {\n" +
+                "    \"documentId\": {\n" +
+                "      \"type\": \"string\",\n" +
+                "      \"description\": \"The unique identifier of the document (file ID from the file search results).\"\n" +
+                "    },\n" +
+                "    \"documentName\": {\n" +
+                "      \"type\": \"string\",\n" +
+                "      \"description\": \"The name of the document file.\"\n" +
+                "    },\n" +
+                "    \"chunkText\": {\n" +
+                "      \"type\": \"string\",\n" +
+                "      \"description\": \"The text chunk or excerpt from the document that supports the response.\"\n" +
+                "    },\n" +
+                "    \"pageNumber\": {\n" +
+                "      \"type\": [\"integer\", \"null\"],\n" +
+                "      \"description\": \"The page number where the citation text is found (if available).\"\n" +
+                "    },\n" +
+                "    \"section\": {\n" +
+                "      \"type\": [\"string\", \"null\"],\n" +
+                "      \"description\": \"The section or chapter name where the citation text is found (if available).\"\n" +
+                "    }\n" +
+                "  },\n" +
+                "  \"required\": [\"documentId\", \"documentName\", \"chunkText\", \"pageNumber\", \"section\"],\n" +
+                "  \"additionalProperties\": false\n" +
+                "}"),
             strictModeEnabled: true
         );
 
@@ -118,9 +109,9 @@ namespace VirtualHRFoundryAgent
             var root = argumentsJson.RootElement;
 
             // Extract required parameters
-            string documentId = root.GetProperty("documentId").GetString();
-            string documentName = root.GetProperty("documentName").GetString();
-            string chunkText = root.GetProperty("chunkText").GetString();
+            string documentId = root.GetProperty("documentId").GetString()!;
+            string documentName = root.GetProperty("documentName").GetString()!;
+            string chunkText = root.GetProperty("chunkText").GetString()!;
 
             // Extract optional parameters
             int? pageNumber = null;
@@ -131,7 +122,7 @@ namespace VirtualHRFoundryAgent
                     pageNumber = pageValue;
                 }
                 else if (pageElement.ValueKind == JsonValueKind.String &&
-                         int.TryParse(pageElement.GetString(), out var pageValueFromString))
+                         int.TryParse(pageElement.GetString() ?? string.Empty, out var pageValueFromString))
                 {
                     pageNumber = pageValueFromString;
                 }
@@ -141,7 +132,7 @@ namespace VirtualHRFoundryAgent
             if (root.TryGetProperty("section", out JsonElement sectionElement))
             {
                 section = sectionElement.ValueKind == JsonValueKind.String
-                    ? sectionElement.GetString()
+                    ? sectionElement.GetString() ?? string.Empty
                     : sectionElement.ToString();
             }
 
