@@ -95,7 +95,7 @@ public class HRAgentController : ControllerBase
     public async IAsyncEnumerable<string> SetupKnowledgeBase()
     {
         var client = CreateClient();
-        string pdfFolder = "C:\\Users\\AzureAdmin\\Desktop\\demo\\Project\\HRPolicyWebAPI\\Policy Documents";// change this to your path to the policy doc folder
+        string pdfFolder = "C:\\AzureFoundry\\HRPolicyWebAPI\\Policy Documents";// change this to your path to the policy doc folder
 
         if (!Directory.Exists(pdfFolder))
         {
@@ -232,7 +232,7 @@ public class HRAgentController : ControllerBase
     // used to set instructions in agent definition
     private async Task<string> GetAgentInstructionsAsync()
     {
-        var filePath = "C:\\AzureFoundry\\HRPolicyWebAPI\\backend\\HRAgentInstructions.txt";
+        var filePath = "C:\\AzureFoundry\\HRPolicyWebAPI\\backend\\HRAgentInstructionsV2.txt";
 
         if (!System.IO.File.Exists(filePath))
         {
